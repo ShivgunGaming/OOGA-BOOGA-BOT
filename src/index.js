@@ -6,7 +6,7 @@ const client = new Client({
 });
 
 client.on('ready', (c) => {
-    console.log(`${c.user.username} is awake and ready for action!`)
+    console.log(`:robot: **${c.user.username}** is awake and ready for action! :rocket:`)
 });
 
 // Additional commands
@@ -20,7 +20,7 @@ client.on('messageCreate', (message) => {
         const choices = ['rock', 'paper', 'scissors'];
         const botChoice = choices[Math.floor(Math.random() * choices.length)];
 
-        message.channel.send('Choose your weapon: rock, paper, or scissors!');
+        message.channel.send(':fist: :raised_hand: :v: Choose your weapon: **rock**, **paper**, or **scissors**!');
 
         const filter = m => !m.author.bot && choices.includes(m.content.toLowerCase());
         const collector = message.channel.createMessageCollector({ filter, time: 60000 });
@@ -29,13 +29,13 @@ client.on('messageCreate', (message) => {
             const userChoice = m.content.toLowerCase();
             const result = determineWinner(userChoice, botChoice);
 
-            message.channel.send(`You chose ${userChoice}. I chose ${botChoice}. ${result}`);
+            message.channel.send(`You chose **${userChoice}**. I chose **${botChoice}**. ${result} :trophy:`);
 
             collector.stop();
         });
 
         collector.on('end', () => {
-            message.channel.send('Game over.');
+            message.channel.send('Game over. :x:');
         });
     }
 
@@ -46,9 +46,9 @@ client.on('messageCreate', (message) => {
         } else if ((player === 'rock' && bot === 'scissors') ||
                    (player === 'paper' && bot === 'rock') ||
                    (player === 'scissors' && bot === 'paper')) {
-            return 'You win!';
+            return 'You win! :tada:';
         } else {
-            return 'I win!';
+            return 'I win! :tada:';
         }
     }
 
@@ -56,7 +56,7 @@ client.on('messageCreate', (message) => {
     if (message.content.toLowerCase() === '!guess') {
         const numberToGuess = Math.floor(Math.random() * 100) + 1;
         let attempts = 5;
-        message.channel.send('I\'m thinking of a number between 1 and 100. You have 5 attempts to guess it.');
+        message.channel.send('I\'m thinking of a number between **1** and **100**. You have **5** attempts to guess it. :1234:');
 
         const filter = m => !m.author.bot;
         const collector = message.channel.createMessageCollector({ filter, time: 60000 });
@@ -65,42 +65,42 @@ client.on('messageCreate', (message) => {
             const guess = parseInt(m.content);
 
             if (isNaN(guess)) {
-                message.channel.send('Please enter a valid number.');
+                message.channel.send('Please enter a valid number. :warning:');
                 return;
             }
 
             attempts--;
 
             if (guess === numberToGuess) {
-                message.channel.send(`Congratulations, ${m.author.username}! You guessed the number ${numberToGuess} correctly!`);
+                message.channel.send(`Congratulations, **${m.author.username}**! You guessed the number **${numberToGuess}** correctly! :tada:`);
                 collector.stop();
             } else if (guess < numberToGuess) {
-                message.channel.send('Too low! Try again.');
+                message.channel.send('Too low! Try again. :arrow_down:');
             } else {
-                message.channel.send('Too high! Try again.');
+                message.channel.send('Too high! Try again. :arrow_up:');
             }
 
             if (attempts === 0) {
-                message.channel.send(`Sorry, you've run out of attempts. The correct number was ${numberToGuess}.`);
+                message.channel.send(`Sorry, you've run out of attempts. The correct number was **${numberToGuess}**. :x:`);
                 collector.stop();
             }
         });
 
         collector.on('end', () => {
-            message.channel.send('Game over.');
+            message.channel.send('Game over. :x:');
         });
     }
 
     // Command to display bot's ping
     if (message.content.toLowerCase() === '!ping') {
         const ping = client.ws.ping;
-        message.channel.send(`Pong! My current ping is ${ping}ms.`);
+        message.channel.send(`Pong! My current ping is **${ping}ms**. :ping_pong:`);
     }
 
     // Command to roll a dice
     if (message.content.toLowerCase() === '!roll') {
         const diceRoll = Math.floor(Math.random() * 6) + 1;
-        message.channel.send(`You rolled a ${diceRoll}!`);
+        message.channel.send(`You rolled a **${diceRoll}**! :game_die:`);
     }
 
     // Command to display a random cat image
@@ -111,12 +111,12 @@ client.on('messageCreate', (message) => {
     // Command to display server information
     if (message.content.toLowerCase() === '!serverinfo') {
         const server = message.guild;
-        message.channel.send(`Server name: ${server.name}\nTotal members: ${server.memberCount}`);
+        message.channel.send(`Server name: **${server.name}**\nTotal members: **${server.memberCount}** :bar_chart:`);
     }
 
     // Command to greet user with their username
     if (message.content.toLowerCase() === 'hello') {
-        message.reply(`Hello ${message.author.username}!`);
+        message.reply(`Hello **${message.author.username}**! :wave:`);
     }
 
     // Command to send a random joke
@@ -129,13 +129,13 @@ client.on('messageCreate', (message) => {
             "Did you hear about the mathematician who’s afraid of negative numbers? He’ll stop at nothing to avoid them!",
         ];
         const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
-        message.channel.send(randomJoke);
+        message.channel.send(`*${randomJoke}* :joy:`);
     }
 
     // Command to display server's current time
     if (message.content.toLowerCase() === '!time') {
         const currentTime = new Date().toLocaleTimeString();
-        message.channel.send(`The current time is: ${currentTime}`);
+        message.channel.send(`The current time is: **${currentTime}** :clock1:`);
     }
 });
 
