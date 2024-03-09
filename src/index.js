@@ -19,6 +19,26 @@ client.on('messageCreate', (message) => {
         return;
     }
 
+    // Command to display all available commands
+    if (message.content.toLowerCase() === '!help') {
+        // Creating a list of available commands
+        const helpMessage = `
+        **Available Commands:**
+        - !rps: Play Rock, Paper, Scissors game
+        - !guess: Play Guess the Number game
+        - !ping: Display bot's current ping
+        - !roll: Roll a dice
+        - !cat: Display a random cat image
+        - !serverinfo: Display server information
+        - !hello: Greet the user
+        - !joke: Display a random joke
+        - !time: Display server's current time
+        - !inspire: Get a random inspirational quote`;
+
+        // Sending the list of available commands
+        message.channel.send(helpMessage);
+    }
+
     // Command to play "Rock, Paper, Scissors" game
     if (message.content.toLowerCase() === '!rps') {
         // Array of choices for the game
