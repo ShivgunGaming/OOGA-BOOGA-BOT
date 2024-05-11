@@ -1,6 +1,7 @@
 // Importing required modules and configuring environment variables
 require("dotenv").config();
 const { Client, IntentsBitField } = require("discord.js");
+const fetch = require("node-fetch");
 
 // Creating a new Discord client instance with specified intents
 const client = new Client({
@@ -12,35 +13,82 @@ const client = new Client({
   ],
 });
 
+// Command prefix
+const commandPrefix = "!";
+
 // Event listener for when the bot is ready
-client.on("ready", (c) => {
-  console.log(
-    `:robot: **${c.user.username}** is awake and ready for action! :rocket:`
-  );
+client.on("ready", () => {
+  console.log(`:robot: **${client.user.username}** is awake and ready for action! :rocket:`);
+});
+
+// Event listener for handling errors
+client.on("error", (error) => {
+  console.error("An error occurred:", error);
 });
 
 // Event listener for when a message is created
-client.on("messageCreate", (message) => {
-  // Check if the message author is a bot, if yes, return
-  if (message.author.bot) {
+client.on("messageCreate", async (message) => {
+  // Check if the message author is a bot or doesn't start with the command prefix, if yes, return
+  if (message.author.bot || !message.content.startsWith(commandPrefix)) {
     return;
   }
 
+  // Splitting the message content into command and arguments
+  const [command, ...args] = message.content.slice(commandPrefix.length).trim().split(/\s+/);
+
+  // Command to get weather information
+  if (command === "weather") {
+    const location = args.join(" ");
+
+    // Checking if a location is provided
+    if (!location) {
+      message.channel.send("Please provide a location.");
+      return;
+    }
+
+    try {
+      // Fetching weather data from OpenWeatherMap API
+      const apiKey = process.env.OPENWEATHERMAP_API_KEY;
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&appid=${apiKey}&units=metric`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      // Checking if the location is valid
+      if (data.cod === "404") {
+        message.channel.send("Location not found.");
+        return;
+      }
+
+      // Extracting relevant weather information
+      const cityName = data.name;
+      const country = data.sys.country;
+      const weatherDescription = data.weather[0].description;
+      const temperature = data.main.temp;
+
+      // Sending weather information
+      message.channel.send(`Weather in ${cityName}, ${country}: ${weatherDescription}, Temperature: ${temperature}°C`);
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+      message.channel.send("An error occurred while fetching weather data.");
+    }
+  }
+
   // Command to display all available commands
-  if (message.content.toLowerCase() === "!help") {
+  if (command === "help") {
     // Creating a list of available commands
     const helpMessage = `
         **Available Commands:**
-        - !rps: Play Rock, Paper, Scissors game
-        - !guess: Play Guess the Number game
-        - !ping: Display bot's current ping
-        - !roll: Roll a dice
-        - !cat: Display a random cat image
-        - !serverinfo: Display server information
-        - !hello: Greet the user
-        - !joke: Display a random joke
-        - !time: Display server's current time
-        - !inspire: Get a random inspirational quote`;
+        - ${commandPrefix}weather <location>: Get current weather information for a location
+        - ${commandPrefix}rps: Play Rock, Paper, Scissors game
+        - ${commandPrefix}guess: Play Guess the Number game
+        - ${commandPrefix}ping: Display bot's current ping
+        - ${commandPrefix}roll: Roll a dice
+        - ${commandPrefix}cat: Display a random cat image
+        - ${commandPrefix}serverinfo: Display server information
+        - ${commandPrefix}hello: Greet the user
+        - ${commandPrefix}joke: Display a random joke
+        - ${commandPrefix}time: Display server's current time
+        - ${commandPrefix}inspire: Get a random inspirational quote`;
 
     // Sending the list of available commands
     message.channel.send(helpMessage);
